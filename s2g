@@ -1,0 +1,25 @@
+#! /bin/bash
+
+## Link to the remote Git Repository 
+REMOTE_REPO="Git_URL"
+
+## Local SVN Directory
+LOCAL_REPO="Local_Dir"
+ 
+REMOTE_REV=`svn info $REMOTE_REPO | grep '^Revision:' | awk '{print $2}'`
+LOCAL_REV=`svn info $LOCAL_REPO | grep '^Revision:' | awk '{print $2}'`
+
+## Diff between Local and Remote Repo 
+if [ $REMOTE_REV -eq $LOCAL_REV ]; then
+  echo `date` "You already have the latest version: $REMOTE_REV"
+  exit 0;
+else
+  ## Run your commands here.
+  echo `date` 'Updating Repo...'
+  cd $LOCAL_REPO
+  svn up
+  REMOTE_REV=`svn info $REMOTE_REPO | grep '^Revision:' | awk '{print $2}'`
+  git add *
+  git commit -a -m "SVN Update# $REMOTE_REV"
+  git push
+fi
